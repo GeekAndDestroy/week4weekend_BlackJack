@@ -1,6 +1,6 @@
-from wrapper import *
+# from wrapper import *
 
-print("Welcome! Let's play some Blackjack!\n")
+# print("Welcome! Let's play some Blackjack!\n")
 
-client = BlackJack()
-client.start_game()
+# client = BlackJack()
+# client.start_game()

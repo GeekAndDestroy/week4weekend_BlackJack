@@ -12,27 +12,9 @@ class Card():
     #     print(f"{self.face} of {self.suit}")
         
     def show_card(self):
-        if self.face == '10':
-            # Adjust spacing for '10' to fit in the card properly
-            face_str = f'║ {self.face} ║'
-        else:
-            face_str = f'║ {self.face:<5} ║'
+        face_str = f'║ {self.face:<5} ║'
 
-        if self.is_ace:
-            visual = [
-                '  ╔════════════╗',
-                f'  {face_str}',
-                '  ║            ║',
-                '  ║            ║',
-                f'  ║     {self.suit:^3}    ║',
-                '  ║            ║',
-                '  ║            ║',
-                '  ║            ║',
-                f'  {face_str}',
-                '  ╚════════════╝'
-            ]
-        else:
-            visual = [
+        visual = [
                 '  ╔════════════╗',
                 f'  {face_str}',
                 '  ║            ║',
@@ -64,32 +46,44 @@ class Card():
 
 
 class Deck():
-    def __init__(self):
+    def __init__(self, num_decks):
         self.deck = []
-        self.suits = ('Clubs', 'Hearts', 'Spades', 'Diamonds')
+        # self.suits = ("Spades", "Hearts","Clubs", "Diamonds")
+        self.suits = ("\u2664", "\u2661","\u2667", "\u2662")
         self.faces = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace')
         self.value = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]
+        self.num_decks = 1
         self.build()
 
     def build(self):
-        for suit in self.suits:
-            for i in range(len(self.faces)):
-                is_ace = False
-                if i == 12:
-                    is_ace = True
-                card = Card(suit, self.faces[i], self.value[i], is_ace) 
-                deck.append(card)
+        num_decks = self.num_decks
+        while num_decks:
+            for suit in self.suits:
+                for i in range(len(self.faces)):
+                    is_ace = False
+                    if i == 12:
+                        is_ace = True
+                    card = Card(suit, self.faces[i], self.value[i], is_ace) 
+                    self.deck.append(card)
+            num_decks -=1
 
     def shuffle(self):
         random.shuffle(self.deck)
+
+    def draw(self):
+        return self.deck.pop()
+    
+    def deck_reset(self):
+        self.deck = []
+        self.build()
     
 
 class Hand():
     def __init__(self):
         self.cards = []
 
-    def add_card(self, card):
-        self.cards.append(card)
+    def add_card(self):
+        self.cards.append(Deck.draw())
 
     def clear_cards(self):
         self.cards.clear()
@@ -111,8 +105,61 @@ class Hand():
 
 
 class Player():
-    pass
+    def __init__(self, name):
+        self.name = name    
+        self.hand = Hand()
+
+    def hit(self, card):
+        
+        pass
+
+    def stand(self):
+        # Implement logic for player standing
+        pass
+
+
+class Dealer():
+    def __init__(self):
+        self.hand = Hand()
+
+    def deal_initial_cards(self, player):
+        # Implement logic for dealing initial cards
+        pass
+
+    def play(self):
+        # Implement logic for dealer's actions
+        pass
 
 
 class BlackJack():
-    pass
+    def __init__(self, player_name):
+        self.player = Player(player_name)
+        self.dealer = Dealer()
+        self.deck = Deck()
+
+    def start_game(self):
+        #shuffle deck
+        self.deck.shuffle()
+        #deal cards
+        #display initial hands
+        pass
+
+    def player_turn(self):
+        #allow player to hit or stand
+        #If playere busts, end game
+        #continue until player stands or busts
+        pass
+
+    def dealer_turn(self):
+        #after player's turn
+        #hit until value is 17 or higher
+        pass
+
+    def determine_winner(self):
+        # compare player and dealer's hands top determine winner or tie(tie:dealer wins)
+        pass
+
+
+    def reset_game(self):
+        ##clear hands and rebuild/shuffle deck
+        pass

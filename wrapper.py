@@ -12,40 +12,39 @@ class Card():
     #     print(f"{self.face} of {self.suit}")
         
     def show_card(self, hidden=False):
-        if hidden:
-            hidden_card_visual = [
-                '   ╔════════════╗',
-                '   ║░░░░░░░░░░░░║',
-                '   ║░░░░░░░░░░░░║',
-                '   ║░░░░░░░░░░░░║',
-                '   ║░░░░░░░░░░░░║',
-                '   ║░░░░░░░░░░░░║',
-                '   ║░░░░░░░░░░░░║',
-                '   ║░░░░░░░░░░░░║',
-                '   ║░░░░░░░░░░░░║',
-                '   ╚════════════╝'
+    
+        face_str = f'║ {self.face:<5}      ║'
+        face_str2 = f'║      {self.face:>5} ║'
+
+        visual = [
+                '  ╔════════════╗',
+                f'  {face_str}',
+                '  ║            ║',
+                '  ║            ║',
+                f'  ║     {self.suit:^3}    ║',
+                '  ║            ║',
+                '  ║            ║',
+                '  ║            ║',
+                f'  {face_str2}',
+                '  ╚════════════╝'
             ]
-            for line in hidden_card_visual:
-                print(line)
-        else:
-            face_str = f'║ {self.face:<5}      ║'
-            face_str2 = f'║      {self.face:>5} ║'
 
-            visual = [
-                    '  ╔════════════╗',
-                    f'  {face_str}',
-                    '  ║            ║',
-                    '  ║            ║',
-                    f'  ║     {self.suit:^3}    ║',
-                    '  ║            ║',
-                    '  ║            ║',
-                    '  ║            ║',
-                    f'  {face_str2}',
-                    '  ╚════════════╝'
-                ]
+        for line in visual:
+            print(line)
 
-            for line in visual:
-                print(line)
+    def hidden_card(self):
+        return [
+            '   ╔════════════╗',
+            '   ║░░░░░░░░░░░░║',
+            '   ║░░░░░░░░░░░░║',
+            '   ║░░░░░░░░░░░░║',
+            '   ║░░░░░░░░░░░░║',
+            '   ║░░░░░░░░░░░░║',
+            '   ║░░░░░░░░░░░░║',
+            '   ║░░░░░░░░░░░░║',
+            '   ║░░░░░░░░░░░░║',
+            '   ╚════════════╝'
+        ]
 
     
 class Deck():
@@ -101,9 +100,15 @@ class Hand():
 
         return hand_value
 
-    def show_hand(self):
-        for card in self.cards:
-            card.show_card()
+    def show_hand(self, hidden= False):
+        for i, card in enumerate(self.cards):
+            if hidden and i == 0:
+                # Show hidden card
+                print("  Hidden Card:")
+                for line in card.hidden_card():
+                    print(line)
+            else:
+                card.show_card()
 
 
 class Player():
@@ -169,14 +174,14 @@ class BlackJack():
     def initial_deal(self):
         # Deal two cards to the player and one card face up to the dealer
         self.dealer.deal_initial_cards(self.player, self.deck)
-        self.dealer.deal_initial_cards(self.dealer, self.deck)
+        # self.dealer.deal_initial_cards(self.dealer, self.deck)
         self.show_initial_hands()
 
     def show_initial_hands(self):
         print(f"\n{self.player.name}'s Hand:")
         self.player.hand.show_hand()
         print(f"\nDealer's Hand:")
-        self.dealer.hand.show_hand()
+        self.dealer.hand.show_hand(hidden=True)
 
     def player_turn(self):
         while True:
@@ -198,7 +203,7 @@ class BlackJack():
                 print("Invalid input. Please enter 'h' to hit or 's' to stand.")
 
     def hit(self, player):
-        card = self.deck.draw_card()
+        card = self.deck.draw()
         player.hand.add_card(card)
         print(f"\n{player.name} hits!")
         print(f"New card: {card.face} of {card.suit}")

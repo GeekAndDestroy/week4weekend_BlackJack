@@ -8,8 +8,7 @@ class Card():
         self.value = value
         self.is_ace = is_ace
 
-    # def show_card(self):
-    #     print(f"{self.face} of {self.suit}")
+   
         
     def show_card(self):
     
@@ -103,8 +102,7 @@ class Hand():
     def show_hand(self, hidden= False):
         for i, card in enumerate(self.cards):
             if hidden and i == 0:
-                # Show hidden card
-                # print("  Hidden Card:")
+                
                 for line in card.hidden_card():
                     print(line)
             else:
@@ -115,14 +113,6 @@ class Player():
     def __init__(self, name):
         self.name = name    
         self.hand = Hand()
-
-    # def hit(self, card):
-        
-    #     pass
-
-    # def stand(self):
-    #     # Implement logic for player standing
-    #     pass
 
 
 class Dealer():
@@ -135,11 +125,6 @@ class Dealer():
             player.hand.add_card(card)
         card = deck.draw()
         self.hand.add_card(card)
-
-
-    # def play(self):
-    #     # Implement logic for dealer's actions
-    #     pass
 
 
 class BlackJack():
@@ -283,7 +268,6 @@ class BlackJack():
         print(f"{self.player.name}: {self.total_score['Player']} wins")
         print(f"Dealer: {self.total_score['Dealer']} wins")
 
-# Implement other classes (Player, Dealer, Deck) and their methods as before
 
 # Start the game
 blackjack_game = BlackJack()

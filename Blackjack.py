@@ -11,7 +11,7 @@ class Card():
     # def show_card(self):
     #     print(f"{self.face} of {self.suit}")
         
-    def show_card(self, hidden=False):
+    def show_card(self):
     
         face_str = f'║ {self.face:<5}      ║'
         face_str2 = f'║      {self.face:>5} ║'
@@ -34,16 +34,16 @@ class Card():
 
     def hidden_card(self):
         return [
-            '   ╔════════════╗',
-            '   ║░░░░░░░░░░░░║',
-            '   ║░░░░░░░░░░░░║',
-            '   ║░░░░░░░░░░░░║',
-            '   ║░░░░░░░░░░░░║',
-            '   ║░░░░░░░░░░░░║',
-            '   ║░░░░░░░░░░░░║',
-            '   ║░░░░░░░░░░░░║',
-            '   ║░░░░░░░░░░░░║',
-            '   ╚════════════╝'
+            '  ╔════════════╗',
+            '  ║░░░░░░░░░░░░║',
+            '  ║░░░░░░░░░░░░║',
+            '  ║░░░░░░░░░░░░║',
+            '  ║░░░░░░░░░░░░║',
+            '  ║░░░░░░░░░░░░║',
+            '  ║░░░░░░░░░░░░║',
+            '  ║░░░░░░░░░░░░║',
+            '  ║░░░░░░░░░░░░║',
+            '  ╚════════════╝'
         ]
 
     
@@ -104,7 +104,7 @@ class Hand():
         for i, card in enumerate(self.cards):
             if hidden and i == 0:
                 # Show hidden card
-                print("  Hidden Card:")
+                # print("  Hidden Card:")
                 for line in card.hidden_card():
                     print(line)
             else:
@@ -159,6 +159,7 @@ class BlackJack():
             self.deck.build()
             self.deck.shuffle()
             self.play_round()
+            self.display_results()
             if not self.play_again():
                 break
         self.display_final_results()
@@ -166,15 +167,32 @@ class BlackJack():
     def play_round(self):
         print("\nStarting new round...")
         self.initial_deal()
-        self.player_turn()
-        if self.player.hand.get_value() <= 21:
+        if self.player.hand.get_value() == 21:
+            pass
+        else:
+            self.player_turn()
+            # if self.player.hand.get_value() <= 21:
             self.dealer_turn()
-            self.determine_winner()
+        self.determine_winner()
+        self.player.hand.clear_cards()
+        self.dealer.hand.clear_cards()
 
     def initial_deal(self):
-        # Deal two cards to the player and one card face up to the dealer
-        self.dealer.deal_initial_cards(self.player, self.deck)
-        # self.dealer.deal_initial_cards(self.dealer, self.deck)
+        # Clear hands before dealing new cards
+        self.player.hand.clear_cards()
+        self.dealer.hand.clear_cards()
+        # Deal one card to the player
+        card = self.deck.draw()
+        self.player.hand.add_card(card)
+        # Deal one card to the dealer (hidden)
+        card = self.deck.draw()
+        self.dealer.hand.add_card(card)
+        # Deal one more card to the player
+        card = self.deck.draw()
+        self.player.hand.add_card(card)
+        # Deal one more card to the dealer
+        card = self.deck.draw()
+        self.dealer.hand.add_card(card)
         self.show_initial_hands()
 
     def show_initial_hands(self):
@@ -184,15 +202,18 @@ class BlackJack():
         self.dealer.hand.show_hand(hidden=True)
 
     def player_turn(self):
+        if self.player.hand.get_value() == 21:
+                print("Blackjack! You win!")
+                return
         while True:
             if self.player.hand.get_value() == 21:
-                print("Blackjack! You win!")
+                print("Blackjack!")
                 break
             action = input("Would you like to hit or stand? (h/s): ").lower()
             if action == 'h':
                 self.hit(self.player)
                 if self.player.hand.get_value() > 21:
-                    print("Bust! Dealer wins.")
+                    print("Bust!")  #Dealer wins.
                     break
                 elif len(self.player.hand.cards) == 5:
                     print("You have 5 cards. You can't hit again.")
@@ -206,27 +227,36 @@ class BlackJack():
         card = self.deck.draw()
         player.hand.add_card(card)
         print(f"\n{player.name} hits!")
-        print(f"New card: {card.face} of {card.suit}")
+        card.show_card()
         print(f"Total value of hand: {player.hand.get_value()}")
 
     def dealer_turn(self):
         print("\nDealer's Turn:")
         self.dealer.hand.show_hand()
         while self.dealer.hand.get_value() < 17:
-            card = self.deck.draw_card()
+            card = self.deck.draw()
             self.dealer.hand.add_card(card)
-            print(f"\nDealer hits! New card: {card.face} of {card.suit}")
+            card.show_card()
             print(f"Total value of dealer's hand: {self.dealer.hand.get_value()}")
         if self.dealer.hand.get_value() > 21:
-            print("Dealer busts! You win!")
+            print("Dealer busts!")
 
     def determine_winner(self):
         player_score = self.player.hand.get_value()
         dealer_score = self.dealer.hand.get_value()
-        if player_score > dealer_score:
+        if player_score > dealer_score and player_score <= 21 and dealer_score <= 21:
             print("You win!")
             self.total_score['Player'] += 1
-        elif player_score < dealer_score:
+        elif player_score <= 21 and dealer_score > 21:
+            print("You win!")
+            self.total_score['Player'] += 1
+        elif player_score < dealer_score and dealer_score <= 21:
+            print("Dealer wins!")
+            self.total_score['Dealer'] += 1
+        elif dealer_score <= 21 and player_score > 21:
+            print("Dealer wins!")
+            self.total_score['Dealer'] += 1
+        elif player_score > 21 and dealer_score > 21:
             print("Dealer wins!")
             self.total_score['Dealer'] += 1
         else:
@@ -234,13 +264,19 @@ class BlackJack():
 
     def play_again(self):
         while True:
-            choice = input("Would you like to play again? (y/n): ").lower()
+            choice = input("\nWould you like to play again? (y/n): ").lower()
             if choice == 'y':
                 return True
             elif choice == 'n':
                 return False
             else:
                 print("Invalid input. Please enter 'y' to play again or 'n' to quit.")
+
+    def display_results(self):
+        print("\nCurrent Results:")
+        print(f"{self.player.name}: {self.total_score['Player']} wins")
+        print(f"Dealer: {self.total_score['Dealer']} wins")
+
 
     def display_final_results(self):
         print("\nFinal Results:")
@@ -254,35 +290,3 @@ blackjack_game = BlackJack()
 blackjack_game.start_game()
 
 
-# class BlackJack():
-#     def __init__(self, player_name):
-#         self.player = Player(player_name)
-#         self.dealer = Dealer()
-#         self.deck = Deck()
-
-#     def start_game(self):
-#         #shuffle deck
-#         self.deck.shuffle()
-#         #deal cards
-#         #display initial hands
-#         pass
-
-#     def player_turn(self):
-#         #allow player to hit or stand
-#         #If playere busts, end game
-#         #continue until player stands or busts
-#         pass
-
-#     def dealer_turn(self):
-#         #after player's turn
-#         #hit until value is 17 or higher
-#         pass
-
-#     def determine_winner(self):
-#         # compare player and dealer's hands top determine winner or tie(tie:dealer wins)
-#         pass
-
-
-#     def reset_game(self):
-#         ##clear hands and rebuild/shuffle deck
-#         pass
